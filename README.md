@@ -1,14 +1,22 @@
 # 가스 공급량 수요 예측 모니터링 대시보드 (Spring Boot)
 
 도시가스 공급량이 **기온 · 인구**와 어떤 관계인지 분석해 **지역 상세 · 전국 통계 · 공급 예측** 화면으로 보여 주는 대시보드입니다.
-그린AI캠퍼스 2차 팀 프로젝트(COMMIT, 3인 · 2026.09.18 ~ 10.16)이며, 저는 팀장이었습니다.
+그린AI캠퍼스 2차 팀 프로젝트(COMMIT, 3인 · 2026.09.18 ~ 10.16)입니다.
 이 저장소는 **웹(Spring Boot)** 이고, 예측 서버(FastAPI) 코드는 [project2_python](https://github.com/jinho333/project2_python)에 있습니다. 예측 서버 설명은 이 README에 함께 적었습니다.
+
+## 제가 맡은 부분
+
+저는 전국 통계 페이지를 주로 맡았습니다. [내 커밋 보기](https://github.com/isnull0x00/project2/commits/dev?author=isnull0x00)
+
+- KPI 카드, 연도별·월별 추이 차트, 지역 트리맵·도넛, 상관표, 예측 오차 카드를 만들고 서비스·DTO·MyBatis 쿼리를 작성했습니다.
+- 전국 페이지가 두 API를 차례로 받던 것을 동시에 요청하게 바꿔, 로컬에서 응답 시간을 258ms에서 169ms로 줄였습니다.
+- 이 페이지는 예측 서버([project2_python](https://github.com/jinho333/project2_python))의 예측 결과를 받아 보여 줍니다.
 
 ![공급 예측 시연](docs/demo-forecast.gif)
 
 > 공급 예측 페이지: 지역을 고르면 다음 달 · 3·6개월 예측과 곡선, 조건을 바꿔 보는 시뮬레이션이 나옵니다.
 
-## 한눈에 보기
+## 한눈에 보기 (팀 결과)
 
 | | |
 |---|---|
@@ -27,16 +35,6 @@ flowchart LR
 ```
 
 FastAPI는 **보조 서버**입니다. 지역 상세 · 전국 통계는 DB의 실제 값으로 그려, 예측 서버가 멈춰도 화면이 동작하도록 나눴습니다.
-
-## 제가 맡은 부분
-
-- EDA와 예측 모델링, 대구 오차 원인 분석(공급이 기온보다 한 달 늦게 반응 → 전월 기온 추가)
-- Python → MariaDB 적재 파이프라인(pymysql · SQLAlchemy)
-- Spring Boot ↔ FastAPI 연동, 공급 예측 · 시뮬레이션 페이지
-- **없는 지역 번호 404 처리**: API 3개가 맨 처음에 `checkRegion()`을 호출합니다. FastAPI를 부르기 전에 확인해, 어차피 거절될 요청을 보내지 않습니다.
-- 비동기 응답 순서 문제 해결(요청 번호 `requestNo`로 옛 응답을 버림)
-
-지역 상세 · 전국 통계 페이지와 데이터 수집 · 전처리는 팀원이 맡았습니다.
 
 ## 예측 서버 (FastAPI) — [project2_python](https://github.com/jinho333/project2_python)
 
