@@ -16,7 +16,7 @@
 
 - **예측 오차 경고 기준을 10%로:** 처음 8%였던 기준을 Lewis(1982)의 관례에 맞춰 10%로 올리고, 근거를 화면 설명에 적었습니다.
 - **울산이 기준을 넘는 까닭을 화면에 밝힘:** 4월·5월 오차(+33%, +21%)가 컸고 두 달 모두 최근 5년 같은 달 범위보다 공급이 낮았습니다. 이 두 달을 빼면 약 6.7%입니다. 6월 값을 교정한 사실도 함께 적었습니다.
-- **상관표를 "전체"와 "같은 달끼리"로 나란히:** 전체로 보면 −0.95인 한 쌍이 같은 달끼리 비교하면 −0.51로 약해졌습니다. 계절 효과를 걷어낸 값도 같이 보여 주려고 두 표를 나란히 두었습니다.
+- **상관표를 "전체"와 "작년 같은 달과의 차이"로 나란히:** 전체로 보면 −0.95인 한 쌍이 같은 달끼리 비교하면 −0.51로 약해졌습니다. 계절 효과를 걷어낸 값도 같이 보여 주려고 두 표를 나란히 두었습니다.
 - **요인 카드의 행은 서버 변수 이름에서 생성:** 변수가 늘어도 화면 코드를 고치지 않고 행이 추가됩니다.
 
 ![공급 예측 시연](docs/demo-forecast.gif)
@@ -58,18 +58,19 @@ FastAPI는 **보조 서버**입니다. 지역 상세 · 전국 통계는 DB의 �
 
 | 주제 | 위치 |
 |---|---|
-| 공통 검증 `checkRegion()` | [`RegionService.java`](src/main/java/com/commit/project2/service/RegionService.java#L91) |
-| API 진입 시점 호출 | [`ForecastApiController.java`](src/main/java/com/commit/project2/controller/ForecastApiController.java#L24) |
-| 요청 번호로 옛 응답 버리기 | [`region.js`](src/main/resources/static/js/region.js#L105) |
+| 전국 상관 행렬(전체 / 작년 같은 달과의 차이) | [`NationalService.java`](src/main/java/com/commit/project2/service/NationalService.java#L220) |
+| 상관계수·기울기 계산 | [`StatUtils.java`](src/main/java/com/commit/project2/util/StatUtils.java) |
+| 울산 오차 설명을 값에서 만드는 화면 코드 | [`national.js`](src/main/resources/static/js/national.js#L969) |
+| 전국 서비스 단위 테스트 | [`NationalServiceTest.java`](src/test/java/com/commit/project2/service/NationalServiceTest.java) |
 
 ```java
-public void checkRegion(Long regionId) {
-  String name = regionMapper.getRegionName(regionId);   // 없는 번호면 null
-  if (name == null) {
-    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 지역 번호입니다: " + regionId);
-  }
+if (yoy) {
+  int[] prev = prevYearIndex(monthly);
+  series = series.stream().map(row -> diffFromPrevYear(row, prev)).toList();
 }
 ```
+
+`yoy`가 true면 각 값에서 작년 같은 달 값을 빼서, 계절 패턴과 완만한 추세를 뺀 변화끼리 상관을 구합니다.
 
 ## 기술 스택
 
